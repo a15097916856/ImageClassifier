@@ -1,0 +1,20 @@
+def predict(image_path, model, topk=5):
+    ''' Predict the class (or classes) of an image using a trained deep learning model.
+    '''
+    model = load_checkpoint('checkpoint.pth')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.eval()
+    image = process_image(image_path)
+    image_tensor = torch.from_numpy(image).type(torch.FloatTensor).unsqueeze_(0)
+    
+    inputs = torch.tensor([image_tensor]).to(device)
+    
+    with torch.no_grad():
+        logps = model.forward(inputs)
+        ps = torch.exp(logps)
+        top_p, top_index = ps.topk(5, dim = 1)
+        index_to_class = {value:key for key, value in model.class_to_idx.items()}
+        top_classes = list(map(lambda index: index_to_class[index], np.array(top_index.cpu())[0]))
+        top_flowers = [cat_to_name[classes] for classes in top_classes ]
+    return top_p, top_classes      
