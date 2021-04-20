@@ -113,11 +113,10 @@ def process_image(path_to_image):
     return np_image
    
               
-def predict(path_to_image, checkpoint_path, top_k):
+def predict(path_to_image, checkpoint_path, top_k, device):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
     model = load_checkpoint(checkpoint_path)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
     image = process_image(path_to_image)
@@ -137,7 +136,7 @@ def predict(path_to_image, checkpoint_path, top_k):
     return top_p, top_classes, top_flowers                    
               
               
-probability, classes, flower_names = predict(path_to_image, checkpoint_path, top_k)
+probability, classes, flower_names = predict(path_to_image, checkpoint_path, top_k, device)
 
 print(f"Probabilities: {probability}")
 
